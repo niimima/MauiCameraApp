@@ -9,7 +9,7 @@ namespace MauiCameraApp.Models
     /// <summary>
     /// 写真
     /// </summary>
-    internal class Photo : ModelBase
+    public class Photo : ModelBase
     {
         #region フィールド
 
@@ -28,7 +28,7 @@ namespace MauiCameraApp.Models
         /// <param name="path">ファイルパス</param>
         internal Photo(string path)
         {
-            Path = path;
+            FilePath = path;
         }
 
         #endregion
@@ -38,7 +38,7 @@ namespace MauiCameraApp.Models
         /// <summary>
         /// パス
         /// </summary>
-        public string Path
+        public string FilePath
         { 
             get => m_Path;
             set

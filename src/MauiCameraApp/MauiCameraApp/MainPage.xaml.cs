@@ -1,4 +1,6 @@
-﻿using MauiCameraApp.Services;
+﻿using MauiCameraApp.Models;
+using MauiCameraApp.Services;
+using System.Collections.ObjectModel;
 
 namespace MauiCameraApp;
 
@@ -6,11 +8,21 @@ public partial class MainPage : ContentPage
 {
 	int count = 0;
 
-    string PhotoPath { get; set; }
+	/// <summary>
+	/// フォトサービス
+	/// </summary>
+	PhotoService m_PhotoService;
 
-	public MainPage()
+    /// <summary>
+    /// 写真一覧
+    /// </summary>
+    public ObservableCollection<Photo> Photos { get; } = new ObservableCollection<Photo>();
+
+    public MainPage()
 	{
 		InitializeComponent();
+		BindingContext = this;
+		m_PhotoService = new PhotoService();
 	}
 
 	private async void OnCounterClicked(object sender, EventArgs e)
@@ -20,9 +32,11 @@ public partial class MainPage : ContentPage
 
 		SemanticScreenReader.Announce(CounterLabel.Text);
 
-		var service = new PhotoService();
-        var photo = await service.TakePhotoAsync();
-		m_Photo.Source = photo.Path;
+        var photo = await m_PhotoService.TakePhotoAsync();
+        if (photo != null)
+        {
+			Photos.Add(photo);
+        }
 	}
 }
 

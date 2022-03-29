@@ -11,7 +11,7 @@ namespace MauiCameraApp.Models
     /// <summary>
     /// モデルベース
     /// </summary>
-    internal class ModelBase : INotifyPropertyChanged
+    public class ModelBase : INotifyPropertyChanged
     {
         #region イベント
 

@@ -45,12 +45,24 @@
                 HeightRequest="310"
                 HorizontalOptions="Center" />
 
-            <Image x:Name="m_Photo" Grid.Row="5"
-                SemanticProperties.Description="Cute dot net bot waving hi to you!"
-                WidthRequest="250"
-                HeightRequest="310"
-                HorizontalOptions="Center" />
-
+			<CollectionView x:Name="m_PhotoCollectionView" Grid.Row="5" ItemsSource="{Binding Photos}">
+				<CollectionView.ItemTemplate>
+					<DataTemplate>
+						<Grid RowDefinitions="Auto,Auto">
+							<Label Grid.Row="0"
+								   Text="Test Photo Title"
+								   FontSize="18"
+								   HorizontalOptions="Center" />
+							<Image Grid.Row="1"
+								   Source="{Binding FilePath}"
+								   SemanticProperties.Description="Cute dot net bot waving hi to you!"
+								   WidthRequest="250"
+								   HeightRequest="310"
+								   HorizontalOptions="Center" />
+						</Grid>
+					</DataTemplate>
+				</CollectionView.ItemTemplate>
+			</CollectionView>
         </Grid>
     </ScrollView>
 </ContentPage>

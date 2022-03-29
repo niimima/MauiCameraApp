@@ -25,7 +25,7 @@ namespace MauiCameraApp.Services
             {
                 var photoResult = await MediaPicker.CapturePhotoAsync();
                 var photo = await LoadPhotoAsync(photoResult);
-                Console.WriteLine($"CapturePhotoAsync COMPLETED: {photo.Path}");
+                Console.WriteLine($"CapturePhotoAsync COMPLETED: {photo.FilePath}");
                 return photo;
             }
             catch (FeatureNotSupportedException fnsEx)
