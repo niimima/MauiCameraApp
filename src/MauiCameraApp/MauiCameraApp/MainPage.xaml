@@ -1,5 +1,6 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:MauiCameraApp"
              x:Class="MauiCameraApp.MainPage"
              BackgroundColor="{DynamicResource SecondaryColor}">
 
@@ -48,19 +49,8 @@
 			<CollectionView x:Name="m_PhotoCollectionView" Grid.Row="5" ItemsSource="{Binding Photos}">
 				<CollectionView.ItemTemplate>
 					<DataTemplate>
-						<Grid RowDefinitions="Auto,Auto">
-							<Label Grid.Row="0"
-								   Text="{Binding Title}"
-								   FontSize="18"
-								   HorizontalOptions="Center" />
-							<Image Grid.Row="1"
-								   Source="{Binding FilePath}"
-								   SemanticProperties.Description="Cute dot net bot waving hi to you!"
-								   WidthRequest="250"
-								   HeightRequest="310"
-								   HorizontalOptions="Center" />
-						</Grid>
-					</DataTemplate>
+                        <views:PhotoItemContentView />
+                    </DataTemplate>
 				</CollectionView.ItemTemplate>
 			</CollectionView>
         </Grid>
