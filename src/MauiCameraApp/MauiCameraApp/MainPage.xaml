@@ -31,13 +31,19 @@
                 x:Name="CounterLabel"
                 HorizontalOptions="Center" />
 
-            <Button 
-                Text="Click me"
-                FontAttributes="Bold"
-                Grid.Row="3"
-                SemanticProperties.Hint="Counts the number of times you click"
-                Clicked="OnCounterClicked"
-                HorizontalOptions="Center" />
+            <StackLayout Grid.Row="3">
+                <Button 
+                    Text="Take a Photo"
+                    FontAttributes="Bold"
+                    SemanticProperties.Hint="Counts the number of times you click"
+                    Clicked="OnCounterClicked"
+                    HorizontalOptions="Center" />
+                <Button
+                    Text="Navigate Another Page"
+                    FontAttributes="Bold"
+                    Clicked="Button_Clicked"
+                    HorizontalOptions="Center" />
+            </StackLayout>
 
             <Image Grid.Row="4"
                 Source="dotnet_bot.png"
