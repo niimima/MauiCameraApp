@@ -14,6 +14,11 @@ namespace MauiCameraApp.Models
         #region フィールド
 
         /// <summary>
+        /// タイトル
+        /// </summary>
+        private string m_Title;
+
+        /// <summary>
         /// パス
         /// </summary>
         private string m_Path;
@@ -34,6 +39,19 @@ namespace MauiCameraApp.Models
         #endregion
 
         #region プロパティ
+
+        /// <summary>
+        /// タイトル
+        /// </summary>
+        public string Title 
+        {
+            get => m_Title;
+            set
+            {
+                m_Title = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// パス

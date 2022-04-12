@@ -50,7 +50,7 @@
 					<DataTemplate>
 						<Grid RowDefinitions="Auto,Auto">
 							<Label Grid.Row="0"
-								   Text="Test Photo Title"
+								   Text="{Binding Title}"
 								   FontSize="18"
 								   HorizontalOptions="Center" />
 							<Image Grid.Row="1"

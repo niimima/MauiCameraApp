@@ -25,6 +25,7 @@ namespace MauiCameraApp.Services
             {
                 var photoResult = await MediaPicker.CapturePhotoAsync();
                 var photo = await LoadPhotoAsync(photoResult);
+                photo.Title = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
                 Console.WriteLine($"CapturePhotoAsync COMPLETED: {photo.FilePath}");
                 return photo;
             }
