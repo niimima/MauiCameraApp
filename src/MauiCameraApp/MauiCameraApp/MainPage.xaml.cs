@@ -1,5 +1,6 @@
 ﻿using MauiCameraApp.Models;
 using MauiCameraApp.Services;
+using MauiCameraApp.ViewModels;
 using System.Collections.ObjectModel;
 
 namespace MauiCameraApp;
@@ -16,12 +17,12 @@ public partial class MainPage : ContentPage
     /// <summary>
     /// 選択されている写真
     /// </summary>
-    public Photo SelectedPhoto { get; set; }
+    public PhotoViewModel SelectedPhoto { get; set; }
 
     /// <summary>
     /// 写真一覧
     /// </summary>
-    public ObservableCollection<Photo> Photos { get; } = new ObservableCollection<Photo>();
+    public ObservableCollection<PhotoViewModel> Photos { get; } = new ObservableCollection<PhotoViewModel>();
 
     /// <summary>
     /// コンストラクタ
@@ -43,7 +44,7 @@ public partial class MainPage : ContentPage
         var photo = await m_PhotoService.TakePhotoAsync();
         if (photo != null)
         {
-			Photos.Add(photo);
+			Photos.Add(new PhotoViewModel(photo));
         }
 	}
 

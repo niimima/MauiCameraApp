@@ -6,12 +6,12 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MauiCameraApp.Models
+namespace MauiCameraApp.ViewModels
 {
     /// <summary>
-    /// モデルベース
+    /// VMベース
     /// </summary>
-    public class ModelBase : INotifyPropertyChanged
+    public class ViewModelBase : INotifyPropertyChanged
     {
         #region イベント
 
