@@ -14,10 +14,18 @@ public partial class MainPage : ContentPage
 	PhotoService m_PhotoService;
 
     /// <summary>
+    /// 選択されている写真
+    /// </summary>
+    public Photo SelectedPhoto { get; set; }
+
+    /// <summary>
     /// 写真一覧
     /// </summary>
     public ObservableCollection<Photo> Photos { get; } = new ObservableCollection<Photo>();
 
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
     public MainPage()
 	{
 		InitializeComponent();
@@ -41,7 +49,10 @@ public partial class MainPage : ContentPage
 
     private async void Button_Clicked(object sender, EventArgs e)
     {
-		await Navigation.PushAsync(new PhotoEditorPage());
+		await Navigation.PushAsync(new PhotoEditorPage()
+        {
+            BindingContext = SelectedPhoto,
+        });
     }
 }
 

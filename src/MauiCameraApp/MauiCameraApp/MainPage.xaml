@@ -52,7 +52,10 @@
                 HeightRequest="310"
                 HorizontalOptions="Center" />
 
-			<CollectionView x:Name="m_PhotoCollectionView" Grid.Row="5" ItemsSource="{Binding Photos}">
+			<CollectionView x:Name="m_PhotoCollectionView" Grid.Row="5"
+                            SelectionMode="Single"
+                            ItemsSource="{Binding Photos}"
+                            SelectedItem="{Binding SelectedPhoto}">
 				<CollectionView.ItemTemplate>
 					<DataTemplate>
                         <views:PhotoItemContentView />
