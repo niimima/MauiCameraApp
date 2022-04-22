@@ -14,10 +14,20 @@ public partial class MainPage : ContentPage
 	/// </summary>
 	PhotoService m_PhotoService;
 
+    private PhotoViewModel m_SelectedPhoto;
+
     /// <summary>
     /// 選択されている写真
     /// </summary>
-    public PhotoViewModel SelectedPhoto { get; set; }
+    public PhotoViewModel SelectedPhoto
+    {
+        get => m_SelectedPhoto;
+        set
+        {
+            m_SelectedPhoto = value;
+            ToggleIsSelected();
+        }
+    }
 
     /// <summary>
     /// 写真一覧
@@ -54,6 +64,17 @@ public partial class MainPage : ContentPage
         {
             BindingContext = SelectedPhoto,
         });
+    }
+
+    /// <summary>
+    /// 選択状態をトグルする
+    /// </summary>
+    private void ToggleIsSelected()
+    {
+        foreach (var item in Photos)
+        {
+            item.IsSelected = item == SelectedPhoto;
+        }
     }
 }
 

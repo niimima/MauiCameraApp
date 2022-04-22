@@ -58,7 +58,20 @@
                             SelectedItem="{Binding SelectedPhoto}">
 				<CollectionView.ItemTemplate>
 					<DataTemplate>
-                        <views:PhotoItemContentView />
+                        <views:PhotoItemContentView>
+                            <views:PhotoItemContentView.Triggers>
+                                <DataTrigger Binding="{Binding IsSelected}"
+                                             TargetType="views:PhotoItemContentView"
+                                             Value="True">
+                                    <Setter Property="BackgroundColor" Value="LightSkyBlue" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsSelected}"
+                                             TargetType="views:PhotoItemContentView"
+                                             Value="False">
+                                    <Setter Property="BackgroundColor" Value="Transparent" />
+                                </DataTrigger>
+                            </views:PhotoItemContentView.Triggers>
+                        </views:PhotoItemContentView>
                     </DataTemplate>
 				</CollectionView.ItemTemplate>
 			</CollectionView>
