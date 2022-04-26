@@ -2,6 +2,7 @@
 using MauiCameraApp.Services;
 using MauiCameraApp.ViewModels;
 using System.Collections.ObjectModel;
+using System.Windows.Input;
 
 namespace MauiCameraApp;
 
@@ -35,6 +36,16 @@ public partial class MainPage : ContentPage
     public ObservableCollection<PhotoViewModel> Photos { get; } = new ObservableCollection<PhotoViewModel>();
 
     /// <summary>
+    /// 編集コマンド
+    /// </summary>
+    public ICommand EditCommand { get; set; }
+
+    /// <summary>
+    /// 削除コマンド
+    /// </summary>
+    public ICommand DeleteCommand { get; set; }
+
+    /// <summary>
     /// コンストラクタ
     /// </summary>
     public MainPage()
@@ -42,9 +53,59 @@ public partial class MainPage : ContentPage
 		InitializeComponent();
 		BindingContext = this;
 		m_PhotoService = new PhotoService();
+
+        EditCommand = new Command(Edit, CanEdit);
+        DeleteCommand = new Command(Delete, CanDelete);
 	}
 
-	private async void OnCounterClicked(object sender, EventArgs e)
+    /// <summary>
+    /// 写真を編集できるか
+    /// </summary>
+    /// <param name="arg"></param>
+    /// <returns>写真を編集できるか</returns>
+    private bool CanEdit(object arg)
+    {
+        return arg != null;
+    }
+
+    /// <summary>
+    /// 写真を編集する
+    /// </summary>
+    /// <param name="obj"></param>
+    private async void Edit(object obj)
+    {
+        if (obj is PhotoViewModel vm)
+        {
+            await Navigation.PushAsync(new PhotoEditorPage()
+            {
+                BindingContext = vm,
+            });
+        }
+    }
+
+    /// <summary>
+    /// 写真を削除できるか
+    /// </summary>
+    /// <param name="arg"></param>
+    /// <returns>写真を削除できるか</returns>
+    private bool CanDelete(object arg)
+    {
+        return arg != null;
+    }
+
+    /// <summary>
+    /// 写真を削除する
+    /// </summary>
+    /// <param name="obj"></param>
+    private void Delete(object obj)
+    {
+        if(obj is PhotoViewModel vm)
+        {
+            Photos.Remove(vm);
+        }
+    }
+
+    private async void OnCounterClicked(object sender, EventArgs e)
 	{
 		count++;
 		CounterLabel.Text = $"Current count: {count}";

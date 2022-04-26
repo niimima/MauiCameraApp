@@ -58,20 +58,34 @@
                             SelectedItem="{Binding SelectedPhoto}">
 				<CollectionView.ItemTemplate>
 					<DataTemplate>
-                        <views:PhotoItemContentView>
-                            <views:PhotoItemContentView.Triggers>
-                                <DataTrigger Binding="{Binding IsSelected}"
-                                             TargetType="views:PhotoItemContentView"
-                                             Value="True">
-                                    <Setter Property="BackgroundColor" Value="LightSkyBlue" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding IsSelected}"
-                                             TargetType="views:PhotoItemContentView"
-                                             Value="False">
-                                    <Setter Property="BackgroundColor" Value="Transparent" />
-                                </DataTrigger>
-                            </views:PhotoItemContentView.Triggers>
-                        </views:PhotoItemContentView>
+                        <SwipeView>
+                            <SwipeView.RightItems>
+                                <SwipeItems>
+                                    <SwipeItem Text="Edit"
+                                               BackgroundColor="LightGreen"
+                                               Command="{Binding Source={x:Reference m_PhotoCollectionView}, Path=BindingContext.EditCommand}"
+                                               CommandParameter="{Binding}"/>
+                                    <SwipeItem Text="Delete"
+                                               BackgroundColor="LightPink"
+                                               Command="{Binding Source={x:Reference m_PhotoCollectionView}, Path=BindingContext.DeleteCommand}"
+                                               CommandParameter="{Binding}"/>
+                                </SwipeItems>
+                            </SwipeView.RightItems>
+                            <views:PhotoItemContentView>
+                                <views:PhotoItemContentView.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected}"
+                                                 TargetType="views:PhotoItemContentView"
+                                                 Value="True">
+                                        <Setter Property="BackgroundColor" Value="LightSkyBlue" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsSelected}"
+                                                 TargetType="views:PhotoItemContentView"
+                                                 Value="False">
+                                        <Setter Property="BackgroundColor" Value="Transparent" />
+                                    </DataTrigger>
+                                </views:PhotoItemContentView.Triggers>
+                            </views:PhotoItemContentView>
+                        </SwipeView>
                     </DataTemplate>
 				</CollectionView.ItemTemplate>
 			</CollectionView>
