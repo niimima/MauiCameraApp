@@ -1,9 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:views="clr-namespace:MauiCameraApp"
+             xmlns:views="clr-namespace:MauiCameraApp.Views"
+             xmlns:graphics="clr-namespace:Microsoft.Maui.Graphics;assembly=Microsoft.Maui"
              x:Class="MauiCameraApp.PhotoEditorPage"
              Title="PhotoEditorPage"
              BackgroundColor="{DynamicResource SecondaryColor}">
-    <views:PhotoItemContentView />
+    <Grid RowDefinitions="Auto">
+        <Grid.Resources>
+            <views:GraphicsDrawable x:Key="Drawable" />
+        </Grid.Resources>
+
+        <Image Grid.Row="0"
+			   Source="{Binding FilePath}"
+			   SemanticProperties.Description="Cute dot net bot waving hi to you!"
+			   WidthRequest="250"
+			   HeightRequest="310"
+			   HorizontalOptions="Center">
+        </Image>
+        <GraphicsView x:Name="m_GraphicsView"
+                      Grid.Row="0"
+                      HeightRequest="300"
+                      WidthRequest="400">
+        </GraphicsView>
+    </Grid>
 </ContentPage>

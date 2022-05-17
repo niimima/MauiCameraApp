@@ -1,4 +1,4 @@
-namespace MauiCameraApp;
+namespace MauiCameraApp.Views;
 
 public partial class PhotoItemContentView : ContentView
 {
