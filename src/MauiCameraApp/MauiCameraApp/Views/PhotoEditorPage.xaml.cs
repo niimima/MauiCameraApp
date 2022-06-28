@@ -16,6 +16,22 @@ public partial class PhotoEditorPage : ContentPage
     /// </summary>
     private SKPoint? touchLocation;
 
+    /// <summary>
+    /// 初期化したか
+    /// </summary>
+    private bool m_Initialized = false;
+
+    /// <summary>
+    /// 描画時に利用するペイント
+    /// </summary>
+    private SKPaint m_Paint = new SKPaint()
+    {
+        Color = SKColors.Black,
+        IsAntialias = true,
+        Style = SKPaintStyle.Stroke,
+        StrokeWidth = 5,
+    };
+
     #endregion
 
     #region 構築
@@ -42,29 +58,27 @@ public partial class PhotoEditorPage : ContentPage
         // the the canvas and properties
         var canvas = e.Surface.Canvas;
 
-        // make sure the canvas is blank
-        canvas.Clear(SKColors.White);
-
-        // decide what the text looks like
-        using var paint = new SKPaint
-        {
-            Color = SKColors.Black,
-            IsAntialias = true,
-            Style = SKPaintStyle.Fill,
-            TextAlign = SKTextAlign.Center,
-            TextSize = 24
-        };
-
         // adjust the location based on the pointer
         var coord = (touchLocation is SKPoint loc)
             ? new SKPoint(loc.X, loc.Y)
-            : new SKPoint(e.Info.Width / 2, (e.Info.Height + paint.TextSize) / 2);
+            : new SKPoint(e.Info.Width / 2, (e.Info.Height + m_Paint.TextSize) / 2);
 
-        // draw some text
-        canvas.DrawText("SkiaSharp", coord, paint);
+        // 初めて表示する場合
+        if (m_Initialized == false)
+        {
+            // 画像を領域いっぱいに表示する
+            var fullRegion = new SKRect(0, 0, e.Info.Width, e.Info.Height);
+            var photoVm = (PhotoViewModel)BindingContext;
+            canvas.DrawImage(SKImage.FromEncodedData(photoVm.FilePath), fullRegion);
 
-        var photoVm = (PhotoViewModel)BindingContext;
-        canvas.DrawImage(SKImage.FromEncodedData(photoVm.FilePath), coord);
+            // 初期表示完了
+            m_Initialized = true;
+        }
+        else
+        {
+            // 点を描画する
+            canvas.DrawPoint(coord, m_Paint);
+        }
     }
 
     /// <summary>
