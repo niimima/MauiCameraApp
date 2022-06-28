@@ -1,10 +1,23 @@
 using MauiCameraApp.ViewModels;
 using MauiCameraApp.Views;
+using SkiaSharp;
 
 namespace MauiCameraApp;
 
+/// <summary>
+/// 写真編集ページ
+/// </summary>
 public partial class PhotoEditorPage : ContentPage
 {
+    #region フィールド
+
+    /// <summary>
+    /// タッチした位置
+    /// </summary>
+    private SKPoint? touchLocation;
+
+    #endregion
+
     #region 構築
 
     /// <summary>
@@ -13,12 +26,6 @@ public partial class PhotoEditorPage : ContentPage
     public PhotoEditorPage()
 	{
 		InitializeComponent();
-
-        // タップジェスチャにイベントハンドラを登録する
-        // https://stackoverflow.com/questions/71911160/how-to-capture-global-touch-events-in-maui-app
-        var tapGestureRecognizer = new TapGestureRecognizer();
-        tapGestureRecognizer.Tapped += TapGestureRecognizer_Tapped;
-        m_GraphicsView.GestureRecognizers.Add(tapGestureRecognizer);
 	}
 
     #endregion
@@ -26,31 +33,55 @@ public partial class PhotoEditorPage : ContentPage
     #region イベントハンドラ
 
     /// <summary>
-    /// タップ後イベントハンドラ
+    /// SkiaViewペイントイベントハンドラ
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void TapGestureRecognizer_Tapped(object sender, EventArgs e)
+    private void m_SkiaView_PaintSurface(object sender, SkiaSharp.Views.Maui.SKPaintSurfaceEventArgs e)
     {
-        // 赤い線を引くのみ
-        m_GraphicsView.Drawable = new GraphicsDrawable();
+        // the the canvas and properties
+        var canvas = e.Surface.Canvas;
+
+        // make sure the canvas is blank
+        canvas.Clear(SKColors.White);
+
+        // decide what the text looks like
+        using var paint = new SKPaint
+        {
+            Color = SKColors.Black,
+            IsAntialias = true,
+            Style = SKPaintStyle.Fill,
+            TextAlign = SKTextAlign.Center,
+            TextSize = 24
+        };
+
+        // adjust the location based on the pointer
+        var coord = (touchLocation is SKPoint loc)
+            ? new SKPoint(loc.X, loc.Y)
+            : new SKPoint(e.Info.Width / 2, (e.Info.Height + paint.TextSize) / 2);
+
+        // draw some text
+        canvas.DrawText("SkiaSharp", coord, paint);
+
+        var photoVm = (PhotoViewModel)BindingContext;
+        canvas.DrawImage(SKImage.FromEncodedData(photoVm.FilePath), coord);
     }
 
-    #endregion
-
-    #region オーバーライド
-
     /// <summary>
-    /// バインディングコンテキスト変更後処理
+    /// SkiaViewタッチ後イベントハンドラ
     /// </summary>
-    protected override void OnBindingContextChanged()
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void m_SkiaView_Touch(object sender, SkiaSharp.Views.Maui.SKTouchEventArgs e)
     {
-        // グラフィックビューに画像を描画
-        var vm = BindingContext as PhotoViewModel;
-        if (vm != null && string.IsNullOrEmpty(vm.FilePath) == false)
-        {
-            m_GraphicsView.Drawable = new ImageDrawable(vm.FilePath);
-        }
+        if (e.InContact)
+            touchLocation = e.Location;
+        else
+            touchLocation = null;
+
+        m_SkiaView.InvalidateSurface();
+
+        e.Handled = true;
     }
 
     #endregion

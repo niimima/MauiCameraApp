@@ -3,27 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:MauiCameraApp.Views"
              xmlns:graphics="clr-namespace:Microsoft.Maui.Graphics;assembly=Microsoft.Maui"
+             xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
              x:Class="MauiCameraApp.PhotoEditorPage"
              Title="PhotoEditorPage"
              BackgroundColor="{DynamicResource SecondaryColor}">
     <Grid RowDefinitions="Auto">
-        <Grid.Resources>
-            <views:GraphicsDrawable x:Key="Drawable" />
-        </Grid.Resources>
-
-<!--
-        <Image Grid.Row="0"
-			   Source="{Binding FilePath}"
-			   SemanticProperties.Description="Cute dot net bot waving hi to you!"
-			   WidthRequest="250"
-			   HeightRequest="310"
-			   HorizontalOptions="Center">
-        </Image>
-        -->
-        <GraphicsView x:Name="m_GraphicsView"
-                      Grid.Row="0"
-                      HeightRequest="300"
-                      WidthRequest="400">
-        </GraphicsView>
+        <skia:SKCanvasView x:Name="m_SkiaView" PaintSurface="m_SkiaView_PaintSurface"
+                           EnableTouchEvents="True" Touch="m_SkiaView_Touch"
+                           IgnorePixelScaling="True" 
+                           HeightRequest="300" WidthRequest="300"/>
     </Grid>
 </ContentPage>
