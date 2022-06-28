@@ -7,29 +7,37 @@ namespace MauiCameraApp;
 /// <summary>
 /// 写真編集ページ
 /// </summary>
+/// <remarks>
+/// 指による描画の章を参照。
+/// https://docs.microsoft.com/ja-jp/xamarin/xamarin-forms/user-interface/graphics/skiasharp/paths/finger-paint
+///
+/// MAUIでのSkiaViewの使い方はサンプルを参照。
+/// https://github.com/mono/SkiaSharp/tree/main/samples/Basic/Maui/SkiaSharpSample
+/// </remarks>
 public partial class PhotoEditorPage : ContentPage
 {
     #region フィールド
 
     /// <summary>
-    /// タッチした位置
+    /// 現在描画中のパス
     /// </summary>
-    private SKPoint? touchLocation;
+    Dictionary<long, SKPath> m_InProgressPaths = new Dictionary<long, SKPath>();
 
     /// <summary>
-    /// 初期化したか
+    /// 描画完了したパス
     /// </summary>
-    private bool m_Initialized = false;
+    List<SKPath> m_CompletedPaths = new List<SKPath>();
 
     /// <summary>
     /// 描画時に利用するペイント
     /// </summary>
     private SKPaint m_Paint = new SKPaint()
     {
-        Color = SKColors.Black,
-        IsAntialias = true,
         Style = SKPaintStyle.Stroke,
+        Color = SKColors.Blue,
         StrokeWidth = 5,
+        StrokeCap = SKStrokeCap.Round,
+        StrokeJoin = SKStrokeJoin.Round,
     };
 
     #endregion
@@ -55,29 +63,22 @@ public partial class PhotoEditorPage : ContentPage
     /// <param name="e"></param>
     private void m_SkiaView_PaintSurface(object sender, SkiaSharp.Views.Maui.SKPaintSurfaceEventArgs e)
     {
-        // the the canvas and properties
-        var canvas = e.Surface.Canvas;
+        SKCanvas canvas = e.Surface.Canvas;
+        canvas.Clear();
 
-        // adjust the location based on the pointer
-        var coord = (touchLocation is SKPoint loc)
-            ? new SKPoint(loc.X, loc.Y)
-            : new SKPoint(e.Info.Width / 2, (e.Info.Height + m_Paint.TextSize) / 2);
+        // 画像を領域いっぱいに表示する
+        var fullRegion = new SKRect(0, 0, e.Info.Width, e.Info.Height);
+        var photoVm = (PhotoViewModel)BindingContext;
+        canvas.DrawImage(SKImage.FromEncodedData(photoVm.FilePath), fullRegion);
 
-        // 初めて表示する場合
-        if (m_Initialized == false)
+        foreach (SKPath path in m_CompletedPaths)
         {
-            // 画像を領域いっぱいに表示する
-            var fullRegion = new SKRect(0, 0, e.Info.Width, e.Info.Height);
-            var photoVm = (PhotoViewModel)BindingContext;
-            canvas.DrawImage(SKImage.FromEncodedData(photoVm.FilePath), fullRegion);
-
-            // 初期表示完了
-            m_Initialized = true;
+            canvas.DrawPath(path, m_Paint);
         }
-        else
+
+        foreach (SKPath path in m_InProgressPaths.Values)
         {
-            // 点を描画する
-            canvas.DrawPoint(coord, m_Paint);
+            canvas.DrawPath(path, m_Paint);
         }
     }
 
@@ -88,12 +89,44 @@ public partial class PhotoEditorPage : ContentPage
     /// <param name="e"></param>
     private void m_SkiaView_Touch(object sender, SkiaSharp.Views.Maui.SKTouchEventArgs e)
     {
-        if (e.InContact)
-            touchLocation = e.Location;
-        else
-            touchLocation = null;
+        switch (e.ActionType)
+        {
+            case SkiaSharp.Views.Maui.SKTouchAction.Pressed:
+                if (!m_InProgressPaths.ContainsKey(e.Id))
+                {
+                    SKPath path = new SKPath();
+                    path.MoveTo(e.Location);
+                    m_InProgressPaths.Add(e.Id, path);
+                    m_SkiaView.InvalidateSurface();
+                }
+                break;
 
-        m_SkiaView.InvalidateSurface();
+            case SkiaSharp.Views.Maui.SKTouchAction.Moved:
+                if (m_InProgressPaths.ContainsKey(e.Id))
+                {
+                    SKPath path = m_InProgressPaths[e.Id];
+                    path.LineTo(e.Location);
+                    m_SkiaView.InvalidateSurface();
+                }
+                break;
+
+            case SkiaSharp.Views.Maui.SKTouchAction.Released:
+                if (m_InProgressPaths.ContainsKey(e.Id))
+                {
+                    m_CompletedPaths.Add(m_InProgressPaths[e.Id]);
+                    m_InProgressPaths.Remove(e.Id);
+                    m_SkiaView.InvalidateSurface();
+                }
+                break;
+
+            case SkiaSharp.Views.Maui.SKTouchAction.Cancelled:
+                if (m_InProgressPaths.ContainsKey(e.Id))
+                {
+                    m_InProgressPaths.Remove(e.Id);
+                    m_SkiaView.InvalidateSurface();
+                }
+                break;
+        }
 
         e.Handled = true;
     }
