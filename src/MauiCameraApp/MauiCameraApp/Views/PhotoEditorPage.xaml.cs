@@ -40,6 +40,11 @@ public partial class PhotoEditorPage : ContentPage
         StrokeJoin = SKStrokeJoin.Round,
     };
 
+    /// <summary>
+    /// 保存時に利用する画像
+    /// </summary>
+    private SKBitmap m_SaveBitmap;
+
     #endregion
 
     #region 構築
@@ -63,23 +68,36 @@ public partial class PhotoEditorPage : ContentPage
     /// <param name="e"></param>
     private void m_SkiaView_PaintSurface(object sender, SkiaSharp.Views.Maui.SKPaintSurfaceEventArgs e)
     {
-        SKCanvas canvas = e.Surface.Canvas;
-        canvas.Clear();
-
-        // 画像を領域いっぱいに表示する
+        SKImageInfo info = e.Info;
+        SKSurface surface = e.Surface;
+        SKCanvas canvas = surface.Canvas;
         var fullRegion = new SKRect(0, 0, e.Info.Width, e.Info.Height);
-        var photoVm = (PhotoViewModel)BindingContext;
-        canvas.DrawImage(SKImage.FromEncodedData(photoVm.FilePath), fullRegion);
 
-        foreach (SKPath path in m_CompletedPaths)
+        // Create bitmap the size of the display surface
+        if (m_SaveBitmap == null)
         {
-            canvas.DrawPath(path, m_Paint);
+            // 初期化時に画像を読み込む
+            var photoVm = (PhotoViewModel)BindingContext;
+            m_SaveBitmap = SKBitmap.FromImage(SKImage.FromEncodedData(photoVm.FilePath));
+        }
+        // Or create new bitmap for a new size of display surface
+        else if (m_SaveBitmap.Width < info.Width || m_SaveBitmap.Height < info.Height)
+        {
+            SKBitmap newBitmap = new SKBitmap(Math.Max(m_SaveBitmap.Width, info.Width),
+                                              Math.Max(m_SaveBitmap.Height, info.Height));
+
+            using (SKCanvas newCanvas = new SKCanvas(newBitmap))
+            {
+                newCanvas.Clear();
+                newCanvas.DrawBitmap(m_SaveBitmap, fullRegion);
+            }
+
+            m_SaveBitmap = newBitmap;
         }
 
-        foreach (SKPath path in m_InProgressPaths.Values)
-        {
-            canvas.DrawPath(path, m_Paint);
-        }
+        // Render the bitmap
+        canvas.Clear();
+        canvas.DrawBitmap(m_SaveBitmap, fullRegion);
     }
 
     /// <summary>
@@ -97,7 +115,7 @@ public partial class PhotoEditorPage : ContentPage
                     SKPath path = new SKPath();
                     path.MoveTo(e.Location);
                     m_InProgressPaths.Add(e.Id, path);
-                    m_SkiaView.InvalidateSurface();
+                    UpdateBitmap();
                 }
                 break;
 
@@ -106,7 +124,7 @@ public partial class PhotoEditorPage : ContentPage
                 {
                     SKPath path = m_InProgressPaths[e.Id];
                     path.LineTo(e.Location);
-                    m_SkiaView.InvalidateSurface();
+                    UpdateBitmap();
                 }
                 break;
 
@@ -115,7 +133,7 @@ public partial class PhotoEditorPage : ContentPage
                 {
                     m_CompletedPaths.Add(m_InProgressPaths[e.Id]);
                     m_InProgressPaths.Remove(e.Id);
-                    m_SkiaView.InvalidateSurface();
+                    UpdateBitmap();
                 }
                 break;
 
@@ -123,12 +141,66 @@ public partial class PhotoEditorPage : ContentPage
                 if (m_InProgressPaths.ContainsKey(e.Id))
                 {
                     m_InProgressPaths.Remove(e.Id);
-                    m_SkiaView.InvalidateSurface();
+                    UpdateBitmap();
                 }
                 break;
         }
 
         e.Handled = true;
+    }
+
+    /// <summary>
+    /// クリアボタン押下時のイベントハンドラ
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="args"></param>
+    void OnClearButtonClicked(object sender, EventArgs args)
+    {
+        m_CompletedPaths.Clear();
+        m_InProgressPaths.Clear();
+        UpdateBitmap();
+    }
+
+    /// <summary>
+    /// 保存ボタン押下時のイベントハンドラ
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="args"></param>
+    async void OnSaveButtonClicked(object sender, EventArgs args)
+    {
+        using (SKImage image = SKImage.FromBitmap(m_SaveBitmap))
+        {
+            SKData data = image.Encode();
+            var photoVm = (PhotoViewModel)BindingContext;
+            string filename = photoVm.FilePath;
+            using (var stream = File.Open(photoVm.FilePath, FileMode.Create))
+                await data.AsStream().CopyToAsync(stream);
+        }
+    }
+
+    #endregion
+
+    #region 内部処理
+    
+    /// <summary>
+    /// 画像を更新する
+    /// </summary>
+    private void UpdateBitmap()
+    {
+        using (SKCanvas saveBitmapCanvas = new SKCanvas(m_SaveBitmap))
+        {
+            foreach (SKPath path in m_CompletedPaths)
+            {
+                saveBitmapCanvas.DrawPath(path, m_Paint);
+            }
+
+            foreach (SKPath path in m_InProgressPaths.Values)
+            {
+                saveBitmapCanvas.DrawPath(path, m_Paint);
+            }
+        }
+
+        m_SkiaView.InvalidateSurface();
     }
 
     #endregion

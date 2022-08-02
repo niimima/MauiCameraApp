@@ -7,10 +7,21 @@
              x:Class="MauiCameraApp.PhotoEditorPage"
              Title="PhotoEditorPage"
              BackgroundColor="{DynamicResource SecondaryColor}">
-    <Grid RowDefinitions="Auto">
+    <Grid RowDefinitions="Auto, Auto, Auto">
         <skia:SKCanvasView x:Name="m_SkiaView" PaintSurface="m_SkiaView_PaintSurface"
                            EnableTouchEvents="True" Touch="m_SkiaView_Touch"
-                           IgnorePixelScaling="True" 
+                           IgnorePixelScaling="True"
                            HeightRequest="300" WidthRequest="300"/>
+
+        <Button Text="Clear"
+                Grid.Row="1"
+                Margin="50, 5"
+                Clicked="OnClearButtonClicked" />
+
+        <Button Text="Save"
+                Grid.Row="2"
+                Margin="50, 5"
+                Clicked="OnSaveButtonClicked" />
+        
     </Grid>
 </ContentPage>
