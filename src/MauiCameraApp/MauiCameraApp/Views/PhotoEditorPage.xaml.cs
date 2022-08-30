@@ -41,6 +41,11 @@ public partial class PhotoEditorPage : ContentPage
     };
 
     /// <summary>
+    /// •ÒW’†‚Ì‰æ‘œ
+    /// </summary>
+    private SKBitmap m_EditingBitmap;
+
+    /// <summary>
     /// •Û‘¶‚É—˜—p‚·‚é‰æ‘œ
     /// </summary>
     private SKBitmap m_SaveBitmap;
@@ -74,30 +79,32 @@ public partial class PhotoEditorPage : ContentPage
         var fullRegion = new SKRect(0, 0, e.Info.Width, e.Info.Height);
 
         // Create bitmap the size of the display surface
-        if (m_SaveBitmap == null)
+        if (m_EditingBitmap == null)
         {
             // ‰Šú‰»‚É‰æ‘œ‚ğ“Ç‚İ‚Ş
             var photoVm = (PhotoViewModel)BindingContext;
+            m_EditingBitmap = SKBitmap.FromImage(SKImage.FromEncodedData(photoVm.FilePath));
             m_SaveBitmap = SKBitmap.FromImage(SKImage.FromEncodedData(photoVm.FilePath));
         }
         // Or create new bitmap for a new size of display surface
-        else if (m_SaveBitmap.Width < info.Width || m_SaveBitmap.Height < info.Height)
+        else if (m_EditingBitmap.Width < info.Width || m_EditingBitmap.Height < info.Height)
         {
-            SKBitmap newBitmap = new SKBitmap(Math.Max(m_SaveBitmap.Width, info.Width),
-                                              Math.Max(m_SaveBitmap.Height, info.Height));
+            SKBitmap newBitmap = new SKBitmap(Math.Max(m_EditingBitmap.Width, info.Width),
+                                              Math.Max(m_EditingBitmap.Height, info.Height));
 
             using (SKCanvas newCanvas = new SKCanvas(newBitmap))
             {
                 newCanvas.Clear();
-                newCanvas.DrawBitmap(m_SaveBitmap, fullRegion);
+                newCanvas.DrawBitmap(m_EditingBitmap, fullRegion);
             }
 
-            m_SaveBitmap = newBitmap;
+            m_EditingBitmap = newBitmap;
+            m_SaveBitmap = newBitmap.Copy();
         }
 
         // Render the bitmap
         canvas.Clear();
-        canvas.DrawBitmap(m_SaveBitmap, fullRegion);
+        canvas.DrawBitmap(m_EditingBitmap, fullRegion);
     }
 
     /// <summary>
@@ -156,6 +163,7 @@ public partial class PhotoEditorPage : ContentPage
     /// <param name="args"></param>
     void OnClearButtonClicked(object sender, EventArgs args)
     {
+        m_EditingBitmap = m_SaveBitmap;
         m_CompletedPaths.Clear();
         m_InProgressPaths.Clear();
         UpdateBitmap();
@@ -187,7 +195,7 @@ public partial class PhotoEditorPage : ContentPage
     /// </summary>
     private void UpdateBitmap()
     {
-        using (SKCanvas saveBitmapCanvas = new SKCanvas(m_SaveBitmap))
+        using (SKCanvas saveBitmapCanvas = new SKCanvas(m_EditingBitmap))
         {
             foreach (SKPath path in m_CompletedPaths)
             {
