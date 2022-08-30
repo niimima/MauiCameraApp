@@ -83,8 +83,8 @@ public partial class PhotoEditorPage : ContentPage
         {
             // èâä˙âªéûÇ…âÊëúÇì«Ç›çûÇﬁ
             var photoVm = (PhotoViewModel)BindingContext;
-            m_EditingBitmap = SKBitmap.FromImage(SKImage.FromEncodedData(photoVm.FilePath));
-            m_SaveBitmap = SKBitmap.FromImage(SKImage.FromEncodedData(photoVm.FilePath));
+            m_EditingBitmap = SKBitmap.FromImage(SKImage.FromEncodedData(photoVm.FilePath)).Resize(e.Info, SKFilterQuality.None);
+            m_SaveBitmap = m_EditingBitmap.Copy();
         }
         // Or create new bitmap for a new size of display surface
         else if (m_EditingBitmap.Width < info.Width || m_EditingBitmap.Height < info.Height)
@@ -163,7 +163,7 @@ public partial class PhotoEditorPage : ContentPage
     /// <param name="args"></param>
     void OnClearButtonClicked(object sender, EventArgs args)
     {
-        m_EditingBitmap = m_SaveBitmap;
+        m_EditingBitmap = m_SaveBitmap.Copy();
         m_CompletedPaths.Clear();
         m_InProgressPaths.Clear();
         UpdateBitmap();
@@ -176,6 +176,7 @@ public partial class PhotoEditorPage : ContentPage
     /// <param name="args"></param>
     async void OnSaveButtonClicked(object sender, EventArgs args)
     {
+        m_SaveBitmap = m_EditingBitmap.Copy();
         using (SKImage image = SKImage.FromBitmap(m_SaveBitmap))
         {
             SKData data = image.Encode();
