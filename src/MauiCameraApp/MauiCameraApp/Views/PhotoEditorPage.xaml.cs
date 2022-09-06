@@ -181,7 +181,8 @@ public partial class PhotoEditorPage : ContentPage
         {
             SKData data = image.Encode();
             var photoVm = (PhotoViewModel)BindingContext;
-            string filename = photoVm.FilePath;
+            var newfileName = Path.GetTempFileName();
+            photoVm.FilePath = newfileName;
             using (var stream = File.Open(photoVm.FilePath, FileMode.Create))
                 await data.AsStream().CopyToAsync(stream);
         }
