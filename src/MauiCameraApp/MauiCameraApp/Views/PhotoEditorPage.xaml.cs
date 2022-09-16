@@ -181,8 +181,9 @@ public partial class PhotoEditorPage : ContentPage
         {
             SKData data = image.Encode();
             var photoVm = (PhotoViewModel)BindingContext;
-            var newfileName = Path.GetTempFileName();
-            photoVm.FilePath = newfileName;
+            var title = DateTime.Now.ToString("yyyyMMdd-HH:mm:ss") + Path.GetExtension(photoVm.FilePath);
+            photoVm.Title = title;
+            photoVm.FilePath = Path.Combine(FileSystem.AppDataDirectory, "MauiCameraApp", title);
             using (var stream = File.Open(photoVm.FilePath, FileMode.Create))
                 await data.AsStream().CopyToAsync(stream);
         }

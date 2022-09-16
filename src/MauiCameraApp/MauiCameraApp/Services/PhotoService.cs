@@ -1,6 +1,7 @@
 ﻿using MauiCameraApp.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,7 +26,6 @@ namespace MauiCameraApp.Services
             {
                 var photoResult = await MediaPicker.CapturePhotoAsync();
                 var photo = await LoadPhotoAsync(photoResult);
-                photo.Title = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
                 Console.WriteLine($"CapturePhotoAsync COMPLETED: {photo.FilePath}");
                 return photo;
             }
@@ -60,12 +60,42 @@ namespace MauiCameraApp.Services
                 return null;
             }
             // save the file into local storage
-            var newFile = Path.Combine(FileSystem.CacheDirectory, photo.FileName);
+            var title = DateTime.Now.ToString("yyyyMMdd-HH:mm:ss") + Path.GetExtension(photo.FileName);
+            var newFile = Path.Combine(FileSystem.AppDataDirectory, "MauiCameraApp", title);
+            var newPhoto = new Photo(newFile)
+            {
+                Title = title,
+            };
             using (var stream = await photo.OpenReadAsync())
             using (var newStream = File.OpenWrite(newFile))
                 await stream.CopyToAsync(newStream);
 
-            return new Photo(newFile);
+            return newPhoto;
+        }
+
+        /// <summary>
+        /// ファイル保存されている画像一覧を取得する
+        /// </summary>
+        /// <returns>ファイル保存されている画像一覧</returns>
+        internal IEnumerable<Photo> GetSavingPhotos()
+        {
+            // 保存先のフォルダがない場合は生成する
+            var savePath = Path.Combine(FileSystem.AppDataDirectory, "MauiCameraApp");
+            if (Directory.Exists(savePath) == false)
+            {
+                Directory.CreateDirectory(savePath);
+            }
+
+            // ファイル一覧をモデルに変換する
+            var files = Directory.GetFiles(savePath);
+            var photos = new List<Photo>();
+            foreach (var file in files)
+            {
+                var photo = new Photo(file);
+                photo.Title = Path.GetFileName(file);
+                photos.Add(photo);
+            }
+            return photos;
         }
     }
 }

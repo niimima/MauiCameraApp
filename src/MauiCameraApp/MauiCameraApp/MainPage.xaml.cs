@@ -56,6 +56,12 @@ public partial class MainPage : ContentPage
 
         EditCommand = new Command(Edit, CanEdit);
         DeleteCommand = new Command(Delete, CanDelete);
+
+        var photos = m_PhotoService.GetSavingPhotos();
+        foreach(var photo in photos)
+        {
+            Photos.Add(new PhotoViewModel(photo));
+        }
 	}
 
     /// <summary>
