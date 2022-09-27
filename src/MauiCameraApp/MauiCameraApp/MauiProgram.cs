@@ -1,4 +1,6 @@
-﻿using SkiaSharp.Views.Maui.Controls.Hosting;
+﻿using MauiCameraApp.Services;
+using Microsoft.Extensions.DependencyInjection;
+using SkiaSharp.Views.Maui.Controls.Hosting;
 
 namespace MauiCameraApp;
 
@@ -14,6 +16,9 @@ public static class MauiProgram
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 			});
+
+		// サービスの登録
+		builder.Services.AddSingleton<PhotoService>();
 
 		return builder.Build();
 	}

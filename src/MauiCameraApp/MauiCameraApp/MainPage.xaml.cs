@@ -48,11 +48,11 @@ public partial class MainPage : ContentPage
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public MainPage()
+    public MainPage(PhotoService photoService)
 	{
 		InitializeComponent();
 		BindingContext = this;
-		m_PhotoService = new PhotoService();
+        m_PhotoService = photoService;
 
         EditCommand = new Command(Edit, CanEdit);
         DeleteCommand = new Command(Delete, CanDelete);
