@@ -1,3 +1,4 @@
+using MauiCameraApp.Services;
 using MauiCameraApp.ViewModels;
 using MauiCameraApp.Views;
 using SkiaSharp;
@@ -50,6 +51,11 @@ public partial class PhotoEditorPage : ContentPage
     /// </summary>
     private SKBitmap m_SaveBitmap;
 
+    /// <summary>
+    /// 写真操作に関するサービス
+    /// </summary>
+    private PhotoService m_PhotoService;
+
     #endregion
 
     #region 構築
@@ -57,9 +63,11 @@ public partial class PhotoEditorPage : ContentPage
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public PhotoEditorPage()
+    public PhotoEditorPage(PhotoService service)
 	{
 		InitializeComponent();
+
+        m_PhotoService = service;
 	}
 
     #endregion
@@ -180,12 +188,16 @@ public partial class PhotoEditorPage : ContentPage
         using (SKImage image = SKImage.FromBitmap(m_SaveBitmap))
         {
             SKData data = image.Encode();
+
+            // TODO ファイルパスが別名でないと画像更新されないため一旦削除した後に保存しなおしている
+            // 事前に写真を削除
             var photoVm = (PhotoViewModel)BindingContext;
-            var title = DateTime.Now.ToString("yyyyMMdd-HH:mm:ss") + Path.GetExtension(photoVm.FilePath);
-            photoVm.Title = title;
-            photoVm.FilePath = Path.Combine(FileSystem.AppDataDirectory, "MauiCameraApp", title);
-            using (var stream = File.Open(photoVm.FilePath, FileMode.Create))
-                await data.AsStream().CopyToAsync(stream);
+            File.Delete(photoVm.FilePath);
+
+            // 新規に保存しなおす
+            photoVm.Title = DateTime.Now.ToString("yyyyMMdd-HH:mm:ss") + Path.GetExtension(photoVm.FilePath);
+            photoVm.FilePath = Path.Combine(FileSystem.AppDataDirectory, "MauiCameraApp", photoVm.Title);
+            await m_PhotoService.SaveFileAsync(data.AsStream(), photoVm.FilePath);
         }
     }
 

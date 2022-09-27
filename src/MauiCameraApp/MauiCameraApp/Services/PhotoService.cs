@@ -15,7 +15,7 @@ namespace MauiCameraApp.Services
     /// 参考記事：
     /// https://docs.microsoft.com/ja-jp/xamarin/essentials/media-picker?tabs=android
     /// </remarks>
-    internal class PhotoService
+    public class PhotoService
     {
         /// <summary>
         /// 写真を撮影する
@@ -53,24 +53,32 @@ namespace MauiCameraApp.Services
         /// <returns>撮影に成功した場合はPhotoクラスを、撮影に失敗した場合はnullを返す</returns>
         async Task<Photo> LoadPhotoAsync(FileResult photo)
         {
-            // canceled
+            // 撮影キャンセルされた場合はnullを返す
             if (photo == null)
             {
-                // 撮影キャンセルされた場合はnullを返す
                 return null;
             }
-            // save the file into local storage
+
+            // ローカルストレージに保存する
             var title = DateTime.Now.ToString("yyyyMMdd-HH:mm:ss") + Path.GetExtension(photo.FileName);
-            var newFile = Path.Combine(FileSystem.AppDataDirectory, "MauiCameraApp", title);
-            var newPhoto = new Photo(newFile)
+            var newFileName = Path.Combine(FileSystem.AppDataDirectory, "MauiCameraApp", title);
+            await SaveFileAsync(await photo.OpenReadAsync(), newFileName);
+
+            // 保存した写真をモデルにして返す
+            var newPhoto = new Photo(newFileName)
             {
                 Title = title,
             };
-            using (var stream = await photo.OpenReadAsync())
-            using (var newStream = File.OpenWrite(newFile))
-                await stream.CopyToAsync(newStream);
-
             return newPhoto;
+        }
+
+        /// <summary>
+        /// ストリームデータをファイルに保存する
+        /// </summary>
+        internal async Task SaveFileAsync(Stream stream, string fileName)
+        {
+            using (var newStream = File.OpenWrite(fileName))
+                await stream.CopyToAsync(newStream);
         }
 
         /// <summary>

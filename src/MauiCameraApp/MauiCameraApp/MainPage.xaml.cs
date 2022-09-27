@@ -82,7 +82,7 @@ public partial class MainPage : ContentPage
     {
         if (obj is PhotoViewModel vm)
         {
-            await Navigation.PushAsync(new PhotoEditorPage()
+            await Navigation.PushAsync(new PhotoEditorPage(m_PhotoService)
             {
                 BindingContext = vm,
             });
@@ -108,6 +108,7 @@ public partial class MainPage : ContentPage
         if(obj is PhotoViewModel vm)
         {
             Photos.Remove(vm);
+            File.Delete(vm.FilePath);
         }
     }
 
@@ -127,7 +128,7 @@ public partial class MainPage : ContentPage
 
     private async void Button_Clicked(object sender, EventArgs e)
     {
-		await Navigation.PushAsync(new PhotoEditorPage()
+		await Navigation.PushAsync(new PhotoEditorPage(m_PhotoService)
         {
             BindingContext = SelectedPhoto,
         });
