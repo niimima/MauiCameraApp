@@ -201,10 +201,24 @@ public partial class PhotoEditorPage : ContentPage
         }
     }
 
+    /// <summary>
+    /// バインディングコンテキスト変更後イベントハンドラ
+    /// </summary>
+    protected override void OnBindingContextChanged()
+    {
+        // 編集対象の画像が切り替わったためクリアする
+        m_CompletedPaths.Clear();
+        m_InProgressPaths.Clear();
+        m_EditingBitmap = null;
+        m_SaveBitmap = null;
+
+        base.OnBindingContextChanged();
+    }
+
     #endregion
 
     #region 内部処理
-    
+
     /// <summary>
     /// 画像を更新する
     /// </summary>

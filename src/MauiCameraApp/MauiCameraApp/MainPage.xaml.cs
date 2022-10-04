@@ -8,14 +8,28 @@ namespace MauiCameraApp;
 
 public partial class MainPage : ContentPage
 {
-	int count = 0;
+    #region フィールド
+
+    int count = 0;
 
 	/// <summary>
 	/// フォトサービス
 	/// </summary>
 	PhotoService m_PhotoService;
 
+    /// <summary>
+    /// 写真編集ページ
+    /// </summary>
+    private PhotoEditorPage m_PhotoEditorPage;
+
+    /// <summary>
+    /// 選択されている写真
+    /// </summary>
     private PhotoViewModel m_SelectedPhoto;
+
+    #endregion
+
+    #region プロパティ
 
     /// <summary>
     /// 選択されている写真
@@ -45,18 +59,25 @@ public partial class MainPage : ContentPage
     /// </summary>
     public ICommand DeleteCommand { get; set; }
 
+    #endregion
+
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public MainPage(PhotoService photoService)
+    public MainPage(PhotoService photoService, PhotoEditorPage photoEditorPage)
 	{
 		InitializeComponent();
 		BindingContext = this;
-        m_PhotoService = photoService;
 
+        // DI注入されたインスタンスをフィールドに保持
+        m_PhotoService = photoService;
+        m_PhotoEditorPage = photoEditorPage;
+
+        // コマンド定義
         EditCommand = new Command(Edit, CanEdit);
         DeleteCommand = new Command(Delete, CanDelete);
 
+        // VMの生成
         var photos = m_PhotoService.GetSavingPhotos();
         foreach(var photo in photos)
         {
@@ -82,10 +103,8 @@ public partial class MainPage : ContentPage
     {
         if (obj is PhotoViewModel vm)
         {
-            await Navigation.PushAsync(new PhotoEditorPage(m_PhotoService)
-            {
-                BindingContext = vm,
-            });
+            m_PhotoEditorPage.BindingContext = vm;
+            await Navigation.PushAsync(m_PhotoEditorPage);
         }
     }
 
@@ -128,10 +147,8 @@ public partial class MainPage : ContentPage
 
     private async void Button_Clicked(object sender, EventArgs e)
     {
-		await Navigation.PushAsync(new PhotoEditorPage(m_PhotoService)
-        {
-            BindingContext = SelectedPhoto,
-        });
+        m_PhotoEditorPage.BindingContext = SelectedPhoto;
+        await Navigation.PushAsync(m_PhotoEditorPage);
     }
 
     /// <summary>
