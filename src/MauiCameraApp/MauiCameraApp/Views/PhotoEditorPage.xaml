@@ -4,6 +4,7 @@
              xmlns:views="clr-namespace:MauiCameraApp.Views"
              xmlns:graphics="clr-namespace:Microsoft.Maui.Graphics;assembly=Microsoft.Maui"
              xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
+             xmlns:device="clr-namespace:Microsoft.Maui.Devices;assembly=Microsoft.Maui.Essentials"
              x:Class="MauiCameraApp.PhotoEditorPage"
              Title="PhotoEditorPage"
              BackgroundColor="{DynamicResource SecondaryColor}">
@@ -11,7 +12,8 @@
         <skia:SKCanvasView x:Name="m_SkiaView" PaintSurface="m_SkiaView_PaintSurface"
                            EnableTouchEvents="True" Touch="m_SkiaView_Touch"
                            IgnorePixelScaling="True"
-                           HeightRequest="300" WidthRequest="300"/>
+				           WidthRequest="320"
+				           HeightRequest="426" />
 
         <Button Text="Clear"
                 Grid.Row="1"

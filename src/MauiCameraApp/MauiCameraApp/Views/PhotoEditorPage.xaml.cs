@@ -1,6 +1,7 @@
 using MauiCameraApp.Services;
 using MauiCameraApp.ViewModels;
 using MauiCameraApp.Views;
+using Microsoft.Maui.Devices;
 using SkiaSharp;
 
 namespace MauiCameraApp;
@@ -84,7 +85,8 @@ public partial class PhotoEditorPage : ContentPage
         SKImageInfo info = e.Info;
         SKSurface surface = e.Surface;
         SKCanvas canvas = surface.Canvas;
-        var fullRegion = new SKRect(0, 0, e.Info.Width, e.Info.Height);
+        // Œ³‰æ‘œ‚ª960x1280
+        var fullRegion = new SKRect(0, 0, 320, 426);
 
         // Create bitmap the size of the display surface
         if (m_EditingBitmap == null)

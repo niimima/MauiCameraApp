@@ -11,8 +11,8 @@
             <Image Grid.Row="1"
 				   Source="{Binding FilePath}"
 				   SemanticProperties.Description="Cute dot net bot waving hi to you!"
-				   WidthRequest="250"
-				   HeightRequest="310"
+				   WidthRequest="240"
+				   HeightRequest="320"
 				   HorizontalOptions="Center" />
         </Grid>
     </ContentView.Content>
