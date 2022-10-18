@@ -10,8 +10,6 @@ public partial class MainPage : ContentPage
 {
     #region フィールド
 
-    int count = 0;
-
 	/// <summary>
 	/// フォトサービス
 	/// </summary>
@@ -133,11 +131,6 @@ public partial class MainPage : ContentPage
 
     private async void OnCounterClicked(object sender, EventArgs e)
 	{
-		count++;
-		CounterLabel.Text = $"Current count: {count}";
-
-		SemanticScreenReader.Announce(CounterLabel.Text);
-
         var photo = await m_PhotoService.TakePhotoAsync();
         if (photo != null)
         {
